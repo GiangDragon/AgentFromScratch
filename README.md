@@ -1,0 +1,1 @@
+This is my personal project to learn basic fundamentals of AI Agent an Git workflow

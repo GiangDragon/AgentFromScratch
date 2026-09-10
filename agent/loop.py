@@ -1,6 +1,10 @@
 import ollama
+import asyncio
+from tools import *
+from tools.execute import execute_tool
 
-def loop(messages, tools):
+
+async def loop(messages, tools):
     while True:
         response = ollama.chat(
             model = "qwen3.5:4b",
@@ -13,7 +17,7 @@ def loop(messages, tools):
 
         if not response.message.tool_calls:
             print(response.message.content)
-            return messages
+            break
 
         for tool_call in response.message.tool_calls:
             print(tool_call)

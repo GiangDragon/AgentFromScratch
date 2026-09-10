@@ -1,38 +1,24 @@
 import ollama
+import asyncio
 from tools import *
 from tools.execute import execute_tool
 from tools.schema import tool_schema
+from agent.loop import loop
+from context.context import build_system_prompt
+
 
 messages = [
-    {"role": "system", "content": "You are a helpful assistant. Use tools to get real-time information when needed."},
-    {"role": "user", "content": "What time is it"},
+    {"role": "system", "content": build_system_prompt()},
+    {"role": "user", "content": "Help me wrote a program that substract two numbers, save it in ~/AgentWorkspace/sub.py"},
 ]
 
 tools = tool_schema
 
 #While loop main
-while True:
-    response = ollama.chat(
-        model = "qwen3.5:4b",
-        messages = messages,
-        tools = tools,
-    )
-
-    assistant_message = response.message
-    messages.append(assistant_message)
-
-    if not response.message.tool_calls:
-        print(response.message.content)
-        break
-
-    for tool_call in response.message.tool_calls:
-        print(tool_call)
-        tool_result = execute_tool(tool_call.function.name, tool_call.function.arguments)
-        messages.append({
-            "role" : "tool",
-            "tool_name" : tool_call.function.name,
-            "content" : tool_result,
-        })
+await loop(
+    messages=messages,
+    tools=tools,
+)
 
 print(messages)
 
